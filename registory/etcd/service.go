@@ -1,7 +1,6 @@
 package etcd
 
 import (
-	"fmt"
 	"github.com/Gitforxuyang/walleManage/config"
 	"github.com/Gitforxuyang/walleManage/util/utils"
 	"github.com/coreos/etcd/clientv3"

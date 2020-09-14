@@ -16,6 +16,5 @@ func main() {
 	sentry.Init()
 	redis.Init()
 	etcd.Init()
-	server.InitApi()
 	server.InitServer()
 }

@@ -15,26 +15,18 @@ import (
 )
 
 //注册关闭服务时的回调
-type RegisterShutdown func()
 
 var (
-	shutdownFunc []RegisterShutdown = make([]RegisterShutdown, 0)
+	r *gin.Engine
 )
 
 func InitServer() {
 	conf := config.GetConfig()
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-	//内部转发
-	r.Group("/rpc",
-		func(ctx *gin.Context) {
-		}).
-		Use(catch.ServerCatch()).
-		POST("/:Service/:Method", func(ctx *gin.Context) {
-
-		})
-
-
+	r = gin.New()
+	r.Use(gin.Logger())
+	r.Use(catch.ServerCatch())
+	controller()
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", conf.GetPort()),
 		Handler: r,
@@ -58,3 +50,16 @@ func InitServer() {
 	srv.Shutdown(context.TODO())
 	logger.GetLogger().Info(context.TODO(), "server stop", logger.Fields{})
 }
+
+func handler(h WalleHandle) gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		data,err:=h(ctx)
+		if err!=nil{
+			ctx.Set("err",err)
+		}else{
+			ctx.Set("res",data)
+		}
+	}
+}
+
+type WalleHandle func(ctx *gin.Context) (interface{},error)
