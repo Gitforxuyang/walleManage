@@ -1,0 +1,8 @@
+<sqlMap>
+    <sql id="user_select_by_login">
+        select * from admin where user_name = ?user_name
+    </sql>
+    <sql id="user_select_by_token">
+        select 1 from admin where token = ?token
+    </sql>
+</sqlMap>

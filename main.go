@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Gitforxuyang/walleManage/client/mysql"
 	"github.com/Gitforxuyang/walleManage/client/redis"
 	"github.com/Gitforxuyang/walleManage/config"
 	"github.com/Gitforxuyang/walleManage/registory/etcd"
@@ -15,6 +16,7 @@ func main() {
 	logger.Init(conf.GetName())
 	sentry.Init()
 	redis.Init()
+	mysql.Init()
 	etcd.Init()
 	server.InitServer()
 }

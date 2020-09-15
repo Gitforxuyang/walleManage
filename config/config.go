@@ -30,6 +30,9 @@ type RedisConfig struct {
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
+type MysqlConfig struct {
+	Addr string
+}
 type EvaConfig struct {
 	name              string
 	port              int32
@@ -40,6 +43,7 @@ type EvaConfig struct {
 	etcd              []string
 	sentryDSN         string
 	redis             map[string]*RedisConfig
+	mysql map[string]*MysqlConfig
 }
 
 var (
@@ -110,6 +114,8 @@ func Init() {
 		if utils.IsNil(v.Get("trace")) {
 			panic("trace设置不能为空")
 		}
+		err = v.UnmarshalKey("mysql", &config.mysql)
+		utils.Must(err)
 		config.sentryDSN = v.GetString("sentry")
 		//watch(client)
 	})
@@ -163,6 +169,15 @@ func (m *EvaConfig) GetRedis(name string) *RedisConfig {
 	c := m.redis[strings.ToLower(name)]
 	if c == nil {
 		panic(fmt.Sprintf("redis：%s配置未找到", name))
+	}
+	return c
+}
+
+
+func (m *EvaConfig) GetMySQL(name string) *MysqlConfig {
+	c := m.mysql[strings.ToLower(name)]
+	if c == nil {
+		panic(fmt.Sprintf("mysql：%s配置未找到", name))
 	}
 	return c
 }
