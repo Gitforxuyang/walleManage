@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	mysql2 "github.com/Gitforxuyang/walleManage/client/mysql"
 	"github.com/Gitforxuyang/walleManage/server/dao"
 	"github.com/Gitforxuyang/walleManage/server/dto"
@@ -15,7 +14,7 @@ func controller() {
 	mysql := mysql2.GetMySQLClient()
 	r.POST("/v1/walle/manage/login", handler(func(ctx *gin.Context) (i interface{}, e error) {
 		body := dto.Login{}
-		buf,err:=ioutil.ReadAll(ctx.Request.Body)
+		buf, err := ioutil.ReadAll(ctx.Request.Body)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
@@ -40,19 +39,26 @@ func controller() {
 		}
 		return nil, errors.New("登陆失败")
 	}))
+
 	r.Group("/v1/walle/manage", func(ctx *gin.Context) {
 		//做登陆状态验证
-		token:=ctx.GetHeader("token")
-		exists,err:=mysql.Exist(&dao.Admin{Token:token})
-		if err!=nil{
-			ctx.Set("err",err)
+		token := ctx.GetHeader("token")
+		exists, err := mysql.Exist(&dao.Admin{Token: token})
+		if err != nil {
+			ctx.Set("err", err)
 			ctx.Abort()
 		}
-		if !exists{
-			ctx.Set("err",errors.New("token验证失败"))
+		if !exists {
+			ctx.Set("err", errors.New("token验证失败"))
 			ctx.Abort()
 		}
-	}).GET("/service", func(ctx *gin.Context) {
-		fmt.Println("service")
-	})
+	}).GET("/service", handler(func(ctx *gin.Context) (i interface{}, e error) {
+		svcs, err := GetService()
+		if err != nil {
+			return nil, err
+		}
+		return map[string]interface{}{"services":svcs},nil
+	})).POST("/api",handler(func(ctx *gin.Context) (i interface{}, e error) {
+		return map[string]interface{}{},nil
+	}))
 }
